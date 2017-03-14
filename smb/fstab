@@ -1,0 +1,14 @@
+# /etc/fstab: static file system information.
+#
+# Use 'blkid' to print the universally unique identifier for a
+# device; this may be used with UUID= as a more robust way to name devices
+# that works even if disks are added and removed. See fstab(5).
+#
+# <file system> <mount point>   <type>  <options>       <dump>  <pass>
+/dev/mapper/srv--geotechcalc--vg-root /               ext4    errors=remount-ro 0       1
+# /boot was on /dev/sda1 during installation
+UUID=88e2423b-9578-4854-a437-bafdbc2a513a /boot           ext2    defaults        0       2
+/dev/mapper/srv--geotechcalc--vg-swap_1 none            swap    sw              0       0
+/dev/data/data /data ext4 defaults 0 0
+mount.pgfuse#host=localhost\040user=postgres\040dbname=portal\040password=Qwertyu*;/data/data-portal-ga3;/data/tmp-portal;\040-v /data/smb-portal fuse noauto,x-systemd.automount,allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800 0 0
+
