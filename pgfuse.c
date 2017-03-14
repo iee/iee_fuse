@@ -2546,19 +2546,17 @@ static int pgfuse_opt_proc ( void* data, const char* arg, int key, struct fuse_a
                         pgfuse->path_portal = strdup( tok );
                         tok = strtok ( NULL, ";" );
 			pgfuse->path_temp = strdup ( tok );
-        	        if ( strstr ( arg, "-s" ) != NULL )
+        	        if ( strstr ( str, "-s" ) != NULL )
 	                {
                         pgfuse->multi_threaded = 0;
                 	}
-	                if ( strstr ( arg, "-v" ) != NULL )
+	                if ( strstr ( str, "-v" ) != NULL )
         	        {
                         pgfuse->verbose = 1;
                 	}
-			fprintf ( stderr, "str=%s\n", arg);
 			free ( str );
 			return 0;
 		}
-
 //		else if ( pgfuse->path_portal == NULL )
 //		{
 //			pgfuse->path_portal = strdup ( arg );
@@ -2687,8 +2685,7 @@ int main ( int argc, char* argv[] )
 		fprintf ( stderr, "Missing portal data path\n" );
 		fprintf ( stderr, "See '%s -h' for usage\n", basename ( argv[0] ) );
 		exit ( EXIT_FAILURE );
-	}else
-	fprintf ( stderr, "pgfuse.path_portal=%s\n", pgfuse.path_portal);
+	}
 
 	if ( pgfuse.path_temp == NULL )
 	{
@@ -2696,9 +2693,7 @@ int main ( int argc, char* argv[] )
 		fprintf ( stderr, "See '%s -h' for usage\n", basename ( argv[0] ) );
 		exit ( EXIT_FAILURE );
 	}else
-	fprintf ( stderr, "pgfuse.path_temp=%s\n", pgfuse.path_temp);
-	fprintf ( stderr, "pgfuse.verbose=%i\n", pgfuse.verbose);
-	fprintf ( stderr, "pgfuse.multi_threaded=%i\n", pgfuse.multi_threaded);
+
 
 	/* just test if the connection can be established, do the
 	 * real connection in the fuse init function!
