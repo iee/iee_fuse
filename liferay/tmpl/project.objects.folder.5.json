@@ -1,0 +1,107 @@
+{
+    "name": "project.objects.folder.5",
+    "inheritRights": "true",
+    "inheritRightsForChildren": "false",
+    "acls": [],
+    "children": [
+        {
+            "name": "project.objects.folder.5.1",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },{
+            "name": "project.objects.folder.5.2",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },{
+            "name": "project.objects.folder.5.3",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },{
+            "name": "project.objects.folder.5.4",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },{
+            "name": "project.objects.folder.5.5",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },{
+            "name": "project.objects.folder.5.6",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },{
+            "name": "project.objects.folder.5.7",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+{
+    "name": "project.objects.folder.7",
+    "inheritRights": "false",
+    "inheritRightsForChildren": "true",
+    "acls": [
+        {
+            "name": "SUPERVISOR",
+            "role": "READ"
+        },
+        {
+            "name": "MEMBER",
+            "role": "WRITE"
+        }
+    ]
+}

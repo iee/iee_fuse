@@ -1,0 +1,77 @@
+{
+    "name": "project.folder.finished-goods",
+    "inheritRights": "false",
+    "acls": [
+        {
+            "name": "ADMIN",
+            "role": "READ"
+        },
+        {
+            "name": "SUPERVISOR",
+            "role": "READ"
+        },
+        {
+            "name": "MEMBER",
+            "role": "READ"
+        }
+    ],
+    "children": [
+        {
+            "name": "project.folder.electronic-documents",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "ADMIN",
+                    "role": "WRITE"
+                },
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },
+        {
+            "name": "project.folder.scans",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "ADMIN",
+                    "role": "WRITE"
+                },
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        },
+        {
+            "name": "project.folder.overhead",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "ADMIN",
+                    "role": "WRITE"
+                },
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        }
+    ]
+}

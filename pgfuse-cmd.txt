@@ -1,0 +1,24 @@
+usermod -aG sudo proguser
+sudo apt-get install sudo mc ssh p7zip-full uuid-dev libcurl4-openssl-dev build-essential pkg-config postgresql postgresql-9.4 postgresql-client-9.4 postgresql-client-common postgresql-common postgresql-contrib-9.4 postgresql-server-dev-9.4
+sudo apt-get install samba samba-common samba-common-bin samba-dev samba-dsdb-modules samba-vfs-modules samba-libs:amd64 libnss-winbind:amd64 libpam-winbind:amd64 libwbclient-dev:amd64 libwbclient0:amd64 winbind
+sudo apt-get install krb5-locales libkrb5-3:amd64 libkrb5support0:amd64 libpam-krb5:amd64 krb5-user krb5-multidev krb5-config openssl fuse libfuse-dev libhiredis-dev ttf-dejavu lxappearance gtk-chtheme libxtst6 python-pip
+passwd postgres
+createdb lportal -O postgres
+ALTER ROLE postgres PASSWORD 'Qwertyu*';
+su -
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee /etc/apt/sources.list.d/webupd8team-java.list
+echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu precise main" | tee -a /etc/apt/sources.list.d/webupd8team-java.list
+apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+apt-get update
+apt-get install oracle-java8-installer
+exit
+sudo pip install redis
+sudo pip install psycopg2
+createdb -O postgres lportal
+net ads join -U ShheblykinN@GEOREC.SPB.RU
+samba-tool domain provision
+update-rc.d tomcat defaults
+sudo route add default gw 192.168.105.1
+psql --dbname=lportalcuda --file=portal.sql --host=localhost -W --username=postgres
+psql -h localhost -U postgres -W lportal < portal.sql
+sudo ./pgfuse "host=localhost user=postgres dbname=lportal password=Qwertyu*" /opt/smb/mnt -o allow_other,big_writes,direct_io,max_readahead=20480

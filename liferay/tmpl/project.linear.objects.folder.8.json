@@ -1,0 +1,15 @@
+{
+    "name": "project.linear.objects.folder.8",
+    "inheritRights": "false",
+    "inheritRightsForChildren": "true",
+    "acls": [
+        {
+            "name": "SUPERVISOR",
+            "role": "READ"
+        },
+        {
+            "name": "MEMBER",
+            "role": "WRITE"
+        }
+    ]
+}

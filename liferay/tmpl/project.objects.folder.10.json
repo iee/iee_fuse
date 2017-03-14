@@ -1,0 +1,28 @@
+{
+    "name": "project.objects.folder.10",
+    "inheritRights": "true",
+    "inheritRightsForChildren": "false",
+    "acls": [
+        {
+            "name": "Пользователи",
+            "role": "WRITE"
+        }
+    ],
+    "children": [
+        {
+            "name": "project.objects.folder.10.1",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                }
+            ]
+        }
+    ]
+}

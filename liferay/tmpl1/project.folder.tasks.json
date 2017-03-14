@@ -1,0 +1,18 @@
+{
+    "name": "project.folder.tasks",
+    "inheritRights": "false",
+    "acls": [
+        {
+            "name": "ADMIN",
+            "role": "READ"
+        },
+        {
+            "name": "SUPERVISOR",
+            "role": "READ"
+        },
+        {
+            "name": "MEMBER",
+            "role": "READ"
+        }
+    ]
+}

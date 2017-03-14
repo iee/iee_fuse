@@ -1,0 +1,38 @@
+{
+    "path":"",
+    "folders": [
+        {
+            "name": "",
+            "inheritRights": "true",
+            "acls": [],
+            "children": [],
+            "templates": [],
+            "availableTemplates": [],
+            "desktopini":[],
+            "children": [
+                {
+                    "name": "dashboard.folder.documents",
+                    "inheritRights": "false",
+                    "inheritRightsForChildren": "true",
+				    "acls": [
+				        {
+				            "name": "ADMIN",
+				            "role": "WRITE"
+				        }
+				    ]
+                },
+                {
+				    "name": "dashboard.folder.exchange",
+				    "inheritRights": "false",
+				    "inheritRightsForChildren": "true",
+				    "acls": [
+				        {
+				            "name": "Геореконструкция",
+				            "role": "WRITE"
+				        }
+				    ]
+				}
+            ]
+        }
+    ]
+}

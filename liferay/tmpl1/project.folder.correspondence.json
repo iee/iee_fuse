@@ -1,0 +1,82 @@
+{
+    "name": "project.folder.correspondence",
+    "inheritRights": "false",
+    "acls": [
+        {
+            "name": "ADMIN",
+            "role": "READ"
+        },
+        {
+            "name": "SUPERVISOR",
+            "role": "READ"
+        },
+        {
+            "name": "MEMBER",
+            "role": "READ"
+        },
+        {
+            "name": "Секретариат",
+            "role": "READ"
+        },
+        {
+            "name": "Администрация",
+            "role": "READ"
+        }
+    ],
+    "children": [
+        {
+            "name": "project.folder.correspondence-in",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "ADMIN",
+                    "role": "WRITE"
+                },
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                },
+		        {
+		            "name": "Секретариат",
+		            "role": "WRITE"
+		        },
+		        {
+		            "name": "Администрация",
+		            "role": "WRITE"
+		        }
+            ]
+        },
+        {
+            "name": "project.folder.correspondence-out",
+            "inheritRights": "false",
+            "inheritRightsForChildren": "true",
+            "acls": [
+                {
+                    "name": "ADMIN",
+                    "role": "WRITE"
+                },
+                {
+                    "name": "SUPERVISOR",
+                    "role": "READ"
+                },
+                {
+                    "name": "MEMBER",
+                    "role": "WRITE"
+                },
+		        {
+		            "name": "Секретариат",
+		            "role": "WRITE"
+		        },
+		        {
+		            "name": "Администрация",
+		            "role": "WRITE"
+		        }
+            ]
+        }
+    ]
+}

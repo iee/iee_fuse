@@ -1,0 +1,59 @@
+Purpose
+-------
+
+Store files and their metadata completely in a PostgreSQL database.
+Expose a standard file system with the help of the FUSE API.
+
+Requirements
+------------
+
+PostgreSQL 8.4 or newer
+FUSE 2.6 or newer
+
+History
+-------
+
+Yes, I know what happens if you store files in a database (in respect to
+drop of efficiency and incremental backups for instance). :-)
+
+Nevertheless, there are special situations, where a filesystem in a database
+is useful. With FUSE this is also rather simple to write.
+
+The reason I wrote one was a project with lots of data on a ReiserFS (at
+least in 2001, this was), which was more or less immutable and should be 
+efficiently stored away (almost in an archive mode). Backup is no issue
+here (as the files are more or less static after an initial load),
+but space efficiency is an issue.
+
+Most other projects try to map an existing database structure somehow as
+files. This here should strictly deal withs files/dirs as the only
+available model.
+ 
+Other projects
+--------------
+
+Pgfs:
+
+  Stores a filesystem in Postgres, exposes it as a NFS server, rather old
+  and I was unable to find the sources.
+
+mysqlfs:
+
+  The blueprint I used and got inspired from. Does exactly the same for
+  the MySQL database.
+  
+  Also the block splitting algorithm I used more or less from this project.
+
+libsqlfs:
+
+  The same for storing files in a Sqlite database.
+  
+curlftpfs:
+
+  Blueprint for some debugging code.
+
+References
+----------
+
+http://www.postgresql.org/docs/
+http://fuse.sourceforge.net/

@@ -1,0 +1,1 @@
+sudo ./pgfuse host=localhost user=postgres dbname=lportal password=Qwertyu* /opt/smb/mnt -d -o allow_other,big_writes,direct_io,max_readahead=20480

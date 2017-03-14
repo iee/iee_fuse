@@ -1,0 +1,45 @@
+{
+    "path":"",
+    "folders": [
+        {
+            "name": "",
+            "inheritRights": "true",
+            "acls": [],
+            "children": [],
+            "templates": [],
+            "availableTemplates": [],
+            "desktopini":[],
+            "children": [
+                {
+                    "name": "project.folder.documents",
+                    "inheritRights": "true",
+                    "acls": [],
+                    "templates": [
+                        "project.folder.exchange",
+                        "project.folder.tasks",
+                        "project.folder.correspondence",
+                        "project.folder.starting-materials",
+                        "project.folder.contractual-documents",
+                        "project.folder.documentation-in-development",
+                        "project.folder.finished-goods"
+                    ],
+                    "availableTemplates": [
+                        "project.folder.exchange",
+                        "project.folder.tasks",
+                        "project.folder.correspondence",
+                        "project.folder.starting-materials",
+                        "project.folder.commercial-offers",
+                        "project.folder.contractual-documents",
+                        "project.folder.materials-for-advertising",
+                        "project.folder.documentation-in-development",
+                        "project.folder.finished-goods",
+                        "project.folder.comments-and-responses",
+                        "project.folder.subcontracts"
+                    ],
+                    "desktopini":[],
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

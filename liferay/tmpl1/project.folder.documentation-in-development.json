@@ -1,0 +1,19 @@
+{
+    "name": "project.folder.documentation-in-development",
+    "inheritRights": "false",
+    "inheritRightsForChildren": "true",
+    "acls": [
+        {
+            "name": "ADMIN",
+            "role": "WRITE"
+        },
+        {
+            "name": "SUPERVISOR",
+            "role": "READ"
+        },
+        {
+            "name": "MEMBER",
+            "role": "WRITE"
+        }
+    ]
+}

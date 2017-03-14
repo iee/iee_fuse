@@ -1,0 +1,44 @@
+TODO list (in order of priority)
+---------
+
+- integrate statfs patch
+  - find alteratives way to determine PGDATA at runtime (by NOT
+    asking the Postgresql server)
+  - find a way to calculate PGDATA while compiling
+- handling of most file system metadata
+  - ownership: how is this done depending on
+    per-user or root mounts? think about security
+    here!
+  - extended attributes
+  - how much access control is possible if not using default_permissions:
+    - group membership doesn't work (design limitation in FUSE)
+    - Selinux will not work because we can't assign parallel contexts,
+      maybe forcing a security context mount option is an option, but
+      so far the fuse mount helper doesn't pass the Selinux mount option
+      to the kernel
+- fill in st_nlink correctly
+- strategy for half-blocks, help PostgreSQL optimize disk usage
+  of data in BYTEA columns. Try to support tails of growing files
+  and tiny files (without padding to the block size)
+- establish self-containment (with respect to
+  a temporarily unavailable Postgresql server)
+- minimal SELinux support, i.e. one fix security context
+  per mount point
+  unique: 8, opcode: GETXATTR (22), nodeid: 7, insize: 68
+  unique: 8, error: -38 (Function not implemented), outsize: 16
+  lsetxattr("file.sgml", "security.selinux", "system_u:object_r:httpd_sys_content_t:s0", 41, 0) = -1 EOPNOTSUPP (Operation not supported)
+  - investigate SELinux races
+  - make some performance tests, see http://archive09.linux.com/feature/127055
+- add options to specify:
+  - prefix for tables and indexes
+  - a --init and a --clean option, using schema.sql as template?
+  - support options to specify names of tables, prefixes or/and namespaces?
+- optimizations:
+  - use prepared statements, measure performance gain
+  - use of asynchonous read/writes
+  - optimize using .flag_nullpath_ok = 1, check functions if they can live without
+    path (but for verbosity and error messages), maybe add path to PgFuseFile
+  - make table names options, in order to store many pgfuse filesystems in one
+    database
+  
+  

@@ -1,0 +1,4 @@
+sudo ./pgfuse "host=localhost user=postgres dbname=lportal password=Qwertyu*" /home/proguser/mnt -o allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800
+sudo ./pgfuse "host=localhost user=postgres dbname=lportal password=Qwertyu*" /data/mnt /data/portal /data/temp -v -o allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800
+sudo ./pgfuse-project "host=localhost user=postgres dbname=lportal-project password=Qwertyu*" /data/mnt-project /data/portal-project /data/temp-project -v -o allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800
+sudo ./pgfuse "host=localhost user=postgres dbname=portal password=Qwertyu*" /data/smb-portal /data/data-portal /data/tmp-portal -v -o allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800

@@ -1,0 +1,31 @@
+{
+    "path":"",
+    "folders": [
+        {
+            "name": "",
+            "inheritRights": "true",
+            "acls": [],
+            "children": [],
+            "templates": [],
+            "availableTemplates": [],
+            "desktopini":[],
+            "children": [
+                {
+                    "name": "org.folder.documents",
+                    "inheritRights": "true",
+                    "acls": [],
+                    "templates": [
+                        "org.folder.exchange",
+                        "org.folder.templates"
+                    ],
+                    "availableTemplates": [
+                        "org.folder.exchange",
+                        "org.folder.templates"
+                    ],
+                    "desktopini":[],
+                    "children": []
+                }
+            ]
+        }
+    ]
+}

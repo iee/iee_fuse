@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment/>
+    <entry key="project.objects.folder.1">01 Пояснительная записка</entry>
+    <entry key="project.objects.folder.2">02 Схема планировочной организации земельного участка</entry>
+    <entry key="project.objects.folder.3">03 Архитектурные решения</entry>
+    <entry key="project.objects.folder.4">04 Конструктивные и объемно-планировочные решения</entry>
+    <entry key="project.objects.folder.5">05 Сведения об инженерном оборудовании</entry>
+    <entry key="project.objects.folder.5.1">5.1 Система электроснабжения</entry>
+    <entry key="project.objects.folder.5.2">5.2 Система водоснабжения</entry>
+    <entry key="project.objects.folder.5.3">5.3 Система водоотведения</entry>
+    <entry key="project.objects.folder.5.4">5.4 Отопление, вентиляция и кондиционирование воздуха, тепловые сети</entry>
+    <entry key="project.objects.folder.5.5">5.5 Сети связи</entry>
+    <entry key="project.objects.folder.5.6">5.6 Система газоснабжения</entry>
+    <entry key="project.objects.folder.5.7">5.7 Технологические решения</entry>
+    <entry key="project.objects.folder.6">06 Проект организации строительства</entry>
+    <entry key="project.objects.folder.7">07 Проект организации работ по демонтажу</entry>
+    <entry key="project.objects.folder.8">08 Перечень мероприятий по охране окружающей среды</entry>
+    <entry key="project.objects.folder.9">09 Мероприятия по обеспечению пожарной безопасности</entry>
+    <entry key="project.objects.folder.10">10 Мероприятия по обеспечению доступа инвалидов</entry>
+    <entry key="project.objects.folder.10.1">10.1 Мероприятия по энергетической эффективности</entry>
+    <entry key="project.objects.folder.11">11 Смета</entry>
+    <entry key="project.objects.folder.12">12 Иная документация</entry>
+    <entry key="project.linear.objects.folder.1">01 Пояснительная записка</entry>
+    <entry key="project.linear.objects.folder.2">02 Проект полосы отвода</entry>
+    <entry key="project.linear.objects.folder.3">03 Технологические и конструктивные решения…</entry>
+    <entry key="project.linear.objects.folder.4">04 Здания, строения и сооружения…</entry>
+    <entry key="project.linear.objects.folder.5">05 Проект организации строительства</entry>
+    <entry key="project.linear.objects.folder.6">06 Проект организации работ по сносу (демонтажу)</entry>
+    <entry key="project.linear.objects.folder.7">07 Мероприятия по охране окружающей среды</entry>
+    <entry key="project.linear.objects.folder.8">08 Мероприятия по обеспечению пожарной безопасности</entry>
+    <entry key="project.linear.objects.folder.9">09 Смета на строительство</entry>
+    <entry key="project.linear.objects.folder.10">10 Иная документация</entry>
+</properties>

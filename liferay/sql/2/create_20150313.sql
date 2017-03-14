@@ -1,0 +1,1 @@
+ALTER TABLE gantt_tasks ADD COLUMN sync_store boolean DEFAULT false;

@@ -1,0 +1,10 @@
+{
+    "data": {
+        "ADMIN": "Site Administrator Low",
+        "SUPERVISOR": "Site Member",
+        "MEMBER": "Site Power User",
+        "Геореконструкция": "User",
+        "Секретариат": "Secretariat",
+        "Администрация": "Administration"
+    }
+}

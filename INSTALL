@@ -1,0 +1,41 @@
+Prerequisites
+-------------
+
+required:
+
+* libpq from Postgresql and header files
+* libfuse FUSE library and header files
+
+Compilation
+-----------
+
+make
+make install [DESTDIR=x] [prefix=x]
+
+Installation
+------------
+
+* Create a postgresql user and database (as user postgres)
+
+    createuser -S -R -D -P someuser (enter some password)
+    createdb -O someuser somedb
+    
+    make sure access permissions are right in pg_hba.conf.
+
+* Initialize the database schema (as user using fuse)
+
+    psql -U someuser somedb < schema.sql
+
+* Mount the FUSE filesystem
+
+    pgfuse "user=someuser dbname=somedb" <mount point>
+    
+    If you use a password, store the password in ~/.pgpass:
+    
+    dbhost:5432:somedb:someuser:somepass
+    
+    (or in any file specified in the PASSFILE environment variable)
+    
+    Though you can specify password directly in the PostgreSQL
+    connection string, this is not safe!
+

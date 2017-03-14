@@ -1,0 +1,11 @@
+{
+    "name": "project.folder.contractual-documents",
+    "inheritRights": "false",
+    "inheritRightsForChildren": "true",
+    "acls": [
+        {
+            "name": "ADMIN",
+            "role": "WRITE"
+        }
+    ]
+}

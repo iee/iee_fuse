@@ -1,0 +1,11 @@
+{
+    "name": "org.folder.templates",
+    "inheritRights": "false",
+    "inheritRightsForChildren": "true",
+    "acls": [
+        {
+            "name": "Геореконструкция",
+            "role": "WRITE"
+        }
+    ]
+}

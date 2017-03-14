@@ -1,0 +1,11 @@
+{
+    "name": "project.folder.exchange",
+    "inheritRights": "false",
+    "inheritRightsForChildren": "true",
+    "acls": [
+        {
+            "name": "Геореконструкция",
+            "role": "WRITE"
+        }
+    ]
+}

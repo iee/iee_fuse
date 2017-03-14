@@ -1,0 +1,36 @@
+{
+    "path":"",
+    "folders": [
+        {
+            "name": "",
+            "inheritRights": "true",
+            "acls": [],
+            "templates": [
+                "project.linear.objects.folder.1",
+                "project.linear.objects.folder.2",
+                "project.linear.objects.folder.3",
+                "project.linear.objects.folder.4",
+                "project.linear.objects.folder.5",
+                "project.linear.objects.folder.6",
+                "project.linear.objects.folder.7",
+                "project.linear.objects.folder.8",
+                "project.linear.objects.folder.9",
+                "project.linear.objects.folder.10"
+            ],
+            "availableTemplates": [
+                "project.linear.objects.folder.1",
+                "project.linear.objects.folder.2",
+                "project.linear.objects.folder.3",
+                "project.linear.objects.folder.4",
+                "project.linear.objects.folder.5",
+                "project.linear.objects.folder.6",
+                "project.linear.objects.folder.7",
+                "project.linear.objects.folder.8",
+                "project.linear.objects.folder.9",
+                "project.linear.objects.folder.10"
+            ],
+            "desktopini":[],
+            "children": []
+        }
+    ]
+}

@@ -1,0 +1,40 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          liferay
+# Required-Start:    $local_fs $remote_fs $network $syslog $named
+# Required-Stop:     $local_fs $remote_fs $network $syslog $named
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# X-Interactive:     true
+# Short-Description: Start liferay daemon at boot time
+# Description:       Enable liferay provided by daemon.
+### END INIT INFO
+
+# Tomcat auto-start
+#
+# chkconfig: - 90 15
+# description: Jakarta Tomcat Java Servlets and JSP server
+
+
+export CATALINA_HOME=/opt/liferay2/tomcat-7.0.62
+
+case $1 in
+start)
+  sh $CATALINA_HOME/bin/catalina.sh start
+  ;;
+stop)
+  sh $CATALINA_HOME/bin/catalina.sh stop
+  ;;
+restart)
+  sh $CATALINA_HOME/bin/catalina.sh stop 10 -force
+  sh $CATALINA_HOME/bin/catalina.sh start
+  ;;
+*)
+  echo "Usage: $0  {start|stop|restart}"
+  exit 1
+  ;;
+esac
+exit 0
+
+

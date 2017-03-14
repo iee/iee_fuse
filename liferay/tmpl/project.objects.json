@@ -1,0 +1,40 @@
+{
+    "path":"",
+    "folders": [
+        {
+            "name": "",
+            "inheritRights": "true",
+            "acls": [],
+            "templates": [
+                "project.objects.folder.1",
+                "project.objects.folder.2",
+                "project.objects.folder.3",
+                "project.objects.folder.4",
+                "project.objects.folder.5",
+                "project.objects.folder.6",
+                "project.objects.folder.7",
+                "project.objects.folder.8",
+                "project.objects.folder.9",
+                "project.objects.folder.10",
+                "project.objects.folder.11",
+                "project.objects.folder.12"
+            ],
+            "availableTemplates": [
+                "project.objects.folder.1",
+                "project.objects.folder.2",
+                "project.objects.folder.3",
+                "project.objects.folder.4",
+                "project.objects.folder.5",
+                "project.objects.folder.6",
+                "project.objects.folder.7",
+                "project.objects.folder.8",
+                "project.objects.folder.9",
+                "project.objects.folder.10",
+                "project.objects.folder.11",
+                "project.objects.folder.12"
+            ],
+            "desktopini":[],
+            "children": []
+        }
+    ]
+}
