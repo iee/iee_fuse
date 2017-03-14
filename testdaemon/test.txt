@@ -1,0 +1,2 @@
+started with pid 1520
+No handlers could be found for logger "stomp.py"
