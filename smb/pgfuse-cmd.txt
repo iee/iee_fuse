@@ -25,3 +25,5 @@ sudo ./pgfuse "host=localhost user=postgres dbname=lportal password=Qwertyu*" /o
 
 gcc -shared -fPIC -O3 getuid.c -I/usr/include/postgresql/9.5/server -lwbclient -lpq -pthread -luuid -shared -o libgetuid.so
 sudo ./pgfuse "host=localhost user=postgres dbname=portal password=Qwertyu*;/data/data-portal-ga3;/data/tmp-portal;" /data/smb-portal -v -o allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800
+sudo ./pgfuse /data/smb-portal -o config=pgfuse.conf,allow_other,blocksize=204800,big_writes,direct_io,auto_cache,max_readahead=204800
+

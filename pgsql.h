@@ -113,7 +113,7 @@ int copy ( PGconn *conn, thredis_t* thredis, const int64_t from_id, const int64_
 
 int copy_mmap ( PGconn *conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t from_id, const int64_t to_id );
 
-int64_t curl_http_get ( const char *str );
+int64_t curl_http_get ( const char *str, cfg_t* cfg );
 
 int64_t exist_name_dlfileentry ( PGconn *conn, const int64_t parent_id, const char *name );
 
@@ -129,7 +129,7 @@ int psql_write_meta ( PGconn *conn, thredis_t* thredis, const int64_t id, const 
 
 int psql_write_meta_to_path ( PGconn *conn, thredis_t* thredis, const char *path, PgMeta* meta );
 
-int64_t psql_create_file ( PGconn *conn, thredis_t* thredis, const int64_t parent_id, const char *path, const char *new_file, PgMeta* meta );
+int64_t psql_create_file ( PGconn *conn, thredis_t* thredis, cfg_t* cfg, const int64_t parent_id, const char *path, const char *new_file, PgMeta* meta );
 
 int psql_create_symlink ( PGconn *conn, const int64_t parent_id, const char *path, const char *new_file, PgMeta meta );
 
@@ -137,11 +137,11 @@ int psql_read_buf ( PGconn *conn, thredis_t* thredis, const size_t block_size, c
 
 int psql_readdir ( PGconn *conn, thredis_t* thredis, const int64_t parent_id, void *buf, fuse_fill_dir_t filler );
 
-int psql_create_dir ( PGconn *conn, thredis_t* thredis, const int64_t parent_id, const char *path, const char *new_dir, PgMeta* meta );
+int psql_create_dir ( PGconn *conn, thredis_t* thredis, cfg_t* cfg, const int64_t parent_id, const char *path, const char *new_dir, PgMeta* meta );
 
-int psql_delete_dir ( PGconn *conn, thredis_t* thredis, const int64_t id, const char *path );
+int psql_delete_dir ( PGconn *conn, thredis_t* thredis, cfg_t* cfg, const int64_t id, const char *path );
 
-int psql_delete_file ( PGconn *conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t id, const char *path );
+int psql_delete_file ( PGconn *conn, const char* path_portal, const char* path_temp, thredis_t* thredis, cfg_t* cfg, const int64_t id, const char *path );
 
 int psql_delete_xattr ( PGconn *conn, thredis_t* thredis, const char *path, const char *name );
 
@@ -157,9 +157,9 @@ int psql_write_buf ( PGconn *conn, const size_t block_size, const int64_t id, co
 
 int psql_truncate ( PGconn *conn, const size_t block_size, const int64_t id, const char *path, const off_t offset );
 
-int psql_rename ( PGconn *conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t from_id, const int64_t from_parent_id, const int64_t to_parent_id, const char *rename_to, const char *from, const char *to );
+int psql_rename ( PGconn *conn, const char* path_portal, const char* path_temp, cfg_t* cfg, thredis_t* thredis, const int64_t from_id, const int64_t from_parent_id, const int64_t to_parent_id, const char *rename_to, const char *from, const char *to );
 
-int psql_rename_to_existing_file ( PGconn *conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t from_id, const int64_t to_id, const char *from_path, const char *to_path );
+int psql_rename_to_existing_file ( PGconn *conn, const char* path_portal, const char* path_temp, thredis_t* thredis, cfg_t* cfg, const int64_t from_id, const int64_t to_id, const char *from_path, const char *to_path );
 
 size_t psql_get_block_size ( PGconn *conn, const size_t block_size );
 

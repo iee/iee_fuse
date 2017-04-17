@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <json-c/json.h>
+#include <confuse.h>
 
 #include <samba-4.0/wbclient.h>
 #include "config.h" /* compiled in defaults */
@@ -440,7 +441,7 @@ size_t write_callback(void *contents, size_t size, size_t nmemb, void *userp)
 	return realsize;
 }
 
-int64_t curl_http_get ( const char* str )
+int64_t curl_http_get ( const char* str, cfg_t* cfg )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	CURL* curl;
@@ -450,7 +451,7 @@ int64_t curl_http_get ( const char* str )
 	chunk.memory = calloc ( 1, 1 );		/* will be grown as needed by the realloc above */ 
 	chunk.size = 0;					/* no data at this point */ 
 	char url[URL_SIZE] = { '\0' };
-	strcpy ( url, "http://test:test@localhost:8080/o/rest/fuse" );
+	strcpy ( url, cfg_getstr ( cfg, "url") ); //"http://test:test@localhost:8080/o/rest/fuse" );
 	strcat ( url, str );
 	curl = curl_easy_init ();
 	if ( curl )
@@ -1128,19 +1129,27 @@ int psql_create_symlink ( PGconn* conn, const int64_t parent_id, const char* pat
 	return 0;
 }
 
-int name_file_is_temp ( const char* new_file )
+int name_file_is_temp ( const char* new_file , cfg_t* cfg )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	int nu = strcmp ( new_file, "null" ) == 0 ? 1 : 0;
+	int nul = strcmp ( get_filename_ext ( new_file ), "" ) == 0 ? 1 : 0;
+	int m = cfg_size ( cfg, "file_extension" );
+	int j;
+	int bak = 0;
+	for ( j = 0; j < m; j++)
+	{
+		bak += strcmp ( get_filename_ext ( new_file ), cfg_getnstr ( cfg, "file_extension", j ) ) == 0 ? 1 : 0;
+	}
+	/*
 	int tmp = strcmp ( get_filename_ext ( new_file ), "tmp" ) == 0 ? 1 : 0;
 	int db = strcmp ( get_filename_ext ( new_file ), "db" ) == 0 ? 1 : 0;
 	int TMP = strcmp ( get_filename_ext ( new_file ), "TMP" ) == 0 ? 1 : 0;
 	int bak = strcmp ( get_filename_ext ( new_file ), "bak" ) == 0 ? 1 : 0;
 	int dwl = strcmp ( get_filename_ext ( new_file ), "dwl" ) == 0 ? 1 : 0;
 	int dwl2 = strcmp ( get_filename_ext ( new_file ), "dwl2" ) == 0 ? 1 : 0;
-	int nul = strcmp ( get_filename_ext ( new_file ), "" ) == 0 ? 1 : 0;
-	if ( ( ispunct ( *new_file ) && ispunct( * ( new_file + 1 ) ) ) || ( db ) || ( nul ) || ( tmp ) || ( TMP ) || ( bak ) || ( nu ) || ( dwl ) || ( dwl2 ) )
-	//if ( ( ispunct ( *new_file ) && ispunct( * ( new_file + 1 ) ) ) || ( db ) || ( tmp ) || ( TMP ) || ( bak ) || ( nu ) || ( dwl ) || ( dwl2 ) )
+	*/
+	if ( ( ispunct ( *new_file ) && ispunct( * ( new_file + 1 ) ) ) || ( nul ) || ( bak ) || ( nu ) )
 	{
 		sprintf ( format_str, "Файл %s временный", new_file );
 		pgfuse_syslog ( LOG_ERR, format_str );
@@ -1154,13 +1163,13 @@ int name_file_is_temp ( const char* new_file )
 	return 0;
 }
 
-int64_t psql_create_file ( PGconn* conn, thredis_t* thredis, const int64_t parent_id, const char* path, const char* new_file, PgMeta* meta )
+int64_t psql_create_file ( PGconn* conn, thredis_t* thredis, cfg_t* cfg, const int64_t parent_id, const char* path, const char* new_file, PgMeta* meta )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	sprintf ( format_str, "Создание файла %s имя %s", path, new_file );
 	pgfuse_syslog ( LOG_ERR, format_str );
 	int64_t id = 0;
-	if ( name_file_is_temp ( new_file ) )
+	if ( name_file_is_temp ( new_file, cfg ) )
 	{
 		int64_t param1 = htobe64( parent_id );
 		int64_t param2 = htobe64( meta->size );
@@ -1204,7 +1213,7 @@ int64_t psql_create_file ( PGconn* conn, thredis_t* thredis, const int64_t paren
 			int64_t groupid = get_groupid_from_parent_id ( conn, parent_id );
 			uint64_t userid = get_userid_from_uid ( conn, thredis, meta->uid );
 			sprintf ( str,"/add-file-entry/repository-id/%"PRIi64"/folder-id/%"PRIi64"/source-file-name/%s/user-id/%zu/size/%"PRIi64"/", groupid, ( groupid == parent_id ? ( int64_t ) 0 : parent_id ), name, userid, meta->size );
-			id = htobe64( curl_http_get ( str ) );
+			id = htobe64( curl_http_get ( str, cfg ) );
 			free ( name );
 			psql_set_id_by_hash_to_redis ( thredis, path, id );
 			/*
@@ -1440,7 +1449,7 @@ int psql_readdir ( PGconn* conn, thredis_t* thredis, const int64_t parent_id, vo
 	return 0;
 }
 
-int psql_create_dir ( PGconn* conn, thredis_t* thredis, const int64_t parent_id, const char* path, const char* new_dir, PgMeta* meta )
+int psql_create_dir ( PGconn* conn, thredis_t* thredis, cfg_t* cfg, const int64_t parent_id, const char* path, const char* new_dir, PgMeta* meta )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	sprintf ( format_str, "Создание каталога %s", path );
@@ -1454,7 +1463,7 @@ int psql_create_dir ( PGconn* conn, thredis_t* thredis, const int64_t parent_id,
 		int64_t id = get_groupid_from_parent_id ( conn, parent_id );
 		uint64_t userid = get_userid_from_uid ( conn, thredis, meta->uid );
 		sprintf ( str, "/add-folder/repository-id/%"PRIi64"/parent-folder-id/%"PRIi64"/name/%s/user-id/%zu/", id, ( id == parent_id ? ( int64_t ) 0 : parent_id ), name, userid );
-		id = htobe64( curl_http_get ( str ) );
+		id = htobe64( curl_http_get ( str, cfg ) );
 		free ( name );
 		psql_set_id_by_hash_to_redis ( thredis, path, id );
 	}
@@ -1487,12 +1496,12 @@ int psql_create_dir ( PGconn* conn, thredis_t* thredis, const int64_t parent_id,
 
 		char str[URL_SIZE] = { '\0' };
 		sprintf ( str, "/delete-file-entry/file-entry-id/%"PRIi64"/", id );
-		curl_http_get ( str );
+		curl_http_get ( str, cfg );
 		char* name = get_file_name ( new_dir );
 		int64_t id = get_groupid_from_parent_id ( conn, parent_id );
 		uint64_t userid = get_userid_from_uid ( conn, thredis, meta->uid );
 		sprintf ( str, "/add-folder/repository-id/%"PRIi64"/parent-folder-id/%"PRIi64"/name/%s/user-id/%zu/", id, ( id == parent_id ? ( int64_t ) 0 : parent_id ), name, userid );
-		id = htobe64( curl_http_get ( str ) );
+		id = htobe64( curl_http_get ( str, cfg ) );
 		free ( name );
 		psql_set_id_by_hash_to_redis ( thredis, path, id );
 	}
@@ -1500,7 +1509,7 @@ int psql_create_dir ( PGconn* conn, thredis_t* thredis, const int64_t parent_id,
 	return 0;
 }
 
-int psql_delete_dir ( PGconn* conn, thredis_t* thredis, const int64_t id, const char* path )
+int psql_delete_dir ( PGconn* conn, thredis_t* thredis, cfg_t* cfg, const int64_t id, const char* path )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	sprintf ( format_str, "Удаление каталога %s ID=%"PRIi64"", path, id );
@@ -1557,7 +1566,7 @@ int psql_delete_dir ( PGconn* conn, thredis_t* thredis, const int64_t id, const 
 	{
 		char str[URL_SIZE] = { '\0' };
 		sprintf ( str, "/delete-folder/folder-id/%"PRIi64"/", id );
-		curl_http_get ( str );
+		curl_http_get ( str, cfg );
 	}
 
 	redisReply* reply;
@@ -1571,7 +1580,7 @@ int psql_delete_dir ( PGconn* conn, thredis_t* thredis, const int64_t id, const 
 	return 0;
 }
 
-int psql_delete_file ( PGconn* conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t id, const char* path )
+int psql_delete_file ( PGconn* conn, const char* path_portal, const char* path_temp, thredis_t* thredis, cfg_t* cfg, const int64_t id, const char* path )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	if ( id < MAX_ID_PORTAL )
@@ -1600,7 +1609,7 @@ int psql_delete_file ( PGconn* conn, const char* path_portal, const char* path_t
 
 		char str[URL_SIZE] = { '\0' };
 		sprintf ( str, "/delete-file-entry/file-entry-id/%"PRIi64"/", id );
-		curl_http_get ( str );
+		curl_http_get ( str, cfg );
 	}
 	else
 	{
@@ -2151,7 +2160,7 @@ int psql_rollback ( PGconn* conn )
 	return 0;
 }
 
-int psql_rename_to_existing_file ( PGconn* conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t from_id, const int64_t to_id, const char* from_path, const char* to_path )
+int psql_rename_to_existing_file ( PGconn* conn, const char* path_portal, const char* path_temp, thredis_t* thredis, cfg_t* cfg, const int64_t from_id, const int64_t to_id, const char* from_path, const char* to_path )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	sprintf( format_str, "Переименование существующего файла из ID=%"PRIi64" в ID=%"PRIi64"", from_id, to_id );
@@ -2250,9 +2259,9 @@ int psql_rename_to_existing_file ( PGconn* conn, const char* path_portal, const 
 		
 		char str[URL_SIZE] = { '\0' };
 		sprintf ( str, "/delete-file-entry/file-entry-id/%"PRIi64"/", to_id );
-		curl_http_get ( str );
+		curl_http_get ( str, cfg );
 		sprintf ( str, "/move-file-entry/file-entry-id/%"PRIi64"/new-folder-id/%"PRIi64"/", from_id, meta.parent_id );
-		curl_http_get ( str );
+		curl_http_get ( str, cfg );
 
 		redisReply* reply;
 		char group[MD5_BUF] = { '\0' };
@@ -2328,7 +2337,7 @@ int psql_rename_to_existing_file ( PGconn* conn, const char* path_portal, const 
 	return 0;
 }
 
-int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, thredis_t* thredis, const int64_t from_id, const int64_t from_parent_id, const int64_t to_parent_id, const char* rename_to, const char* from, const char* to )
+int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, cfg_t* cfg, thredis_t* thredis, const int64_t from_id, const int64_t from_parent_id, const int64_t to_parent_id, const char* rename_to, const char* from, const char* to )
 {
 	char format_str[LOG_LEN] = { '\0' };
 	sprintf( format_str, "Переименование файла id=%"PRIi64" из %s в %s to_parent_id=%"PRIi64" from_parent_id=%"PRIi64"", from_id, from, to, to_parent_id, from_parent_id );
@@ -2348,13 +2357,13 @@ int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, 
 		char str[URL_SIZE] = { '\0' };
 		char* name = get_file_name ( rename_to ); //rename-folder/folder-id/24501
 		sprintf ( str, "/rename-folder/folder-id/%"PRIi64"/new-name/%s/", from_id, name );
-		curl_http_get ( str );
+		curl_http_get ( str, cfg );
 		free ( name );
 
 		if ( from_parent_id != to_parent_id )
 		{
 			sprintf ( str, "/move-folder/folder-id/%"PRIi64"/parent-folder-id/%"PRIi64"/", from_id, to_parent_id );
-			curl_http_get ( str );
+			curl_http_get ( str, cfg );
 		}
 
 		redisReply* reply;
@@ -2367,7 +2376,7 @@ int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, 
 	}
 	else
 	{
-		if ( ( from_id > MAX_ID_PORTAL ) && ( name_file_is_temp ( rename_to ) == 1 ) )
+		if ( ( from_id > MAX_ID_PORTAL ) && ( name_file_is_temp ( rename_to, cfg ) == 1 ) )
 		{
 			PgMeta from_parent_meta;
 			PgMeta to_parent_meta;
@@ -2435,7 +2444,7 @@ int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, 
 			return 0;
 		}
 
-		if ( ( from_id < MAX_ID_PORTAL ) && ( name_file_is_temp ( rename_to ) == 0 ) )
+		if ( ( from_id < MAX_ID_PORTAL ) && ( name_file_is_temp ( rename_to, cfg ) == 0 ) )
 		{
 			PgMeta from_parent_meta;
 			PgMeta to_parent_meta;
@@ -2470,25 +2479,25 @@ int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, 
 			{
 				char str[URL_SIZE] = { '\0' };
 				sprintf ( str, "/move-file-entry/file-entry-id/%"PRIi64"/new-folder-id/%"PRIi64"/", from_id, to_parent_id );
-				curl_http_get ( str );
+				curl_http_get ( str, cfg );
 			}
 
 			char str[URL_SIZE] = { '\0' };
 			char* name = get_file_name ( rename_to );
 			sprintf ( str, "/rename-file/file-entry-id/%"PRIi64"/new-name/%s/", from_id, name );
-			curl_http_get ( str );
+			curl_http_get ( str, cfg );
 			free ( name );
 
 			return 0;
 		}
 
 		int64_t id = 0;
-		if ( name_file_is_temp ( rename_to ) == 0 )
+		if ( name_file_is_temp ( rename_to, cfg ) == 0 )
 		{
 			id = exist_name_dlfileentry ( conn, to_parent_id, rename_to );
 			if ( id == -ENOENT )
 			{
-				int res = psql_create_file ( conn, thredis, to_parent_id, to, rename_to, &from_id_meta );
+				int res = psql_create_file ( conn, thredis, cfg, to_parent_id, to, rename_to, &from_id_meta );
 				if ( res < 0 ) return res;
 			}
 			else
@@ -2499,7 +2508,7 @@ int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, 
 		}
 		else
 		{
-			int res = psql_create_file ( conn, thredis, to_parent_id, to, rename_to, &from_id_meta );
+			int res = psql_create_file ( conn, thredis, cfg, to_parent_id, to, rename_to, &from_id_meta );
 			if ( res < 0 ) return res;
 			//psql_copy_xattr_from_to( conn, from_id, to_id );
 			//if ( res < 0 ) return res;
@@ -2552,9 +2561,9 @@ int psql_rename ( PGconn* conn, const char* path_portal, const char* path_temp, 
 					uint64_t userid = get_userid_from_uid ( conn, thredis, uid );
 					char str[URL_SIZE] = { '\0' };
 					sprintf ( str, "/update-file-last-updated/file-entry-id/%"PRIi64"/user-id/%"PRIi64"/size/%zu/", to_id, userid, from_id_meta.size );
-					curl_http_get ( str );
+					curl_http_get ( str, cfg );
 				}
-				psql_delete_file ( conn, path_portal, path_temp, thredis, from_id, from );
+				psql_delete_file ( conn, path_portal, path_temp, thredis, cfg, from_id, from );
 			}
 		}
 	}
