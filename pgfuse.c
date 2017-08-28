@@ -39,6 +39,7 @@
 #include <fcntl.h>
 #include <sys/mman.h>
 #include <curl/curl.h>
+#include <confuse.h>
 
 #if FUSE_VERSION < 21
 #error Currently only written for newer FUSE API (FUSE_VERSION at least 21)
@@ -62,6 +63,7 @@
 typedef struct PgFuseData
 {
 	int verbose; /* whether we should be verbose */
+	cfg_t* cfg;
 	char* path_portal;
 	char* path_temp;
 	char* conninfo; /* connection info as used in PQconnectdb */
@@ -296,7 +298,7 @@ static void* pgfuse_init ( struct fuse_conn_info* conn )
 	pgfuse_syslog ( LOG_INFO, format_str );
 
 	curl_global_init(CURL_GLOBAL_ALL);
-	data->Redisc = redisConnectUnix ( "/var/run/redis/redis.sock" );
+	data->Redisc = redisConnectUnix ( cfg_getstr ( data->cfg, "unixsocket") );
 	data->thredis = thredis_new ( data->Redisc );
 	if ( !data->thredis )
 	{
@@ -622,7 +624,7 @@ static int pgfuse_create ( const char* path, mode_t mode, struct fuse_file_info*
 	meta.atime = meta.ctime;
 	meta.parent_id = parent_id;
 
-	id = psql_create_file ( conn, data->thredis, parent_id, path, new_file, &meta );
+	id = psql_create_file ( conn, data->thredis, data->cfg, parent_id, path, new_file, &meta );
 	if ( id < 0 )
 	{
 		free ( copy_path );
@@ -908,7 +910,7 @@ static int pgfuse_mkdir ( const char* path, mode_t mode )
 	meta.atime = meta.ctime;
 	meta.parent_id = parent_id;
 
-	res = psql_create_dir ( conn, data->thredis, parent_id, path, new_dir, &meta );
+	res = psql_create_dir ( conn, data->thredis, data->cfg, parent_id, path, new_dir, &meta );
 	if ( res < 0 )
 	{
 		free ( copy_path );
@@ -974,7 +976,7 @@ static int pgfuse_rmdir ( const char* path )
 		return -EROFS;
 	}
 
-	res = psql_delete_dir ( conn, data->thredis, id, path );
+	res = psql_delete_dir ( conn, data->thredis, data->cfg, id, path );
 	if ( res < 0 )
 	{
 		PSQL_ROLLBACK( conn );
@@ -1040,7 +1042,7 @@ static int pgfuse_unlink ( const char* path )
 		return -EROFS;
 	}
 
-	res = psql_delete_file ( conn, data->path_portal, data->path_temp, data->thredis, id, path );
+	res = psql_delete_file ( conn, data->path_portal, data->path_temp, data->thredis, data->cfg, id, path );
 	if ( res < 0 )
 	{
 		PSQL_ROLLBACK( conn );
@@ -1184,7 +1186,7 @@ static int pgfuse_release ( const char* path, struct fuse_file_info* fi )
 		uint64_t userid = get_userid_from_uid ( conn, data->thredis, uid );
 		char str[URL_SIZE] = { '\0' };
 		sprintf ( str, "/update-file-last-updated/file-entry-id/%"PRIi64"/user-id/%"PRIi64"/size/%zu/", fi->fh, userid, meta.size );
-		curl_http_get ( str );
+		curl_http_get ( str, data->cfg );
 	}
 
 	reply = thredis_command ( data->thredis, "DEL %s %s", group, "event" );
@@ -1841,13 +1843,13 @@ static int pgfuse_chown ( const char* path, uid_t uid, gid_t gid )
 			{
 				char str[URL_SIZE] = { '\0' };
 				sprintf ( str, "/update-folder-owner/folder-id/%"PRIi64"/user-id/%"PRIi64"/", id, userid );
-				curl_http_get ( str );
+				curl_http_get ( str, data->cfg );
 			}
 			else
 			{
 				char str[URL_SIZE] = { '\0' };
 				sprintf ( str, "/update-file-owner/file-entry-id/%"PRIi64"/user-id/%"PRIi64"/", id, userid );
-				curl_http_get ( str );
+				curl_http_get ( str, data->cfg );
 			}
 		}
 	}
@@ -2040,7 +2042,7 @@ static int pgfuse_rename ( const char* from, const char* to )
 				 * as the source one (preferably atomic because
 				 * of rename/lockfile tricks)
 				 */
-				res = psql_rename_to_existing_file ( conn, data->path_portal, data->path_temp, data->thredis, from_id, to_id, from, to );
+				res = psql_rename_to_existing_file ( conn, data->path_portal, data->path_temp, data->thredis, data->cfg, from_id, to_id, from, to );
 				if ( res < 0 )
 				{
 					PSQL_ROLLBACK( conn );
@@ -2124,7 +2126,7 @@ static int pgfuse_rename ( const char* from, const char* to )
 
 	rename_to = basename ( copy_to );
 
-	res = psql_rename ( conn, data->path_portal, data->path_temp, data->thredis, from_id, from_meta.parent_id, to_parent_id, rename_to, from, to );
+	res = psql_rename ( conn, data->path_portal, data->path_temp, data->cfg, data->thredis, from_id, from_meta.parent_id, to_parent_id, rename_to, from, to );
 
 	PSQL_COMMIT( conn );
 	RELEASE( conn );
@@ -2501,8 +2503,10 @@ typedef struct PgFuseOptions
 	int print_help; /* whether we should print a help page */
 	int print_version; /* whether we should print the version */
 	int verbose; /* whether we should be verbose */
-	char* path_portal; /* path portal DATA */
-	char* path_temp; /* path temp DATA */
+	cfg_t* cfg;
+	char* path_portal;
+	char* config;
+	char* path_temp;
 	char* conninfo; /* connection info as used in PQconnectdb */
 	char* mountpoint; /* where we mount the virtual filesystem */
 	int read_only; /* whether to mount read-only */
@@ -2512,6 +2516,7 @@ typedef struct PgFuseOptions
 } PgFuseOptions;
 
 #define PGFUSE_OPT( t, p, v ) { t, offsetof( PgFuseOptions, p ), v }
+#define OPTION(t, p) { t, offsetof(struct PgFuseOptions, p), 1 }
 
 enum
 {
@@ -2521,7 +2526,15 @@ enum
 static struct fuse_opt pgfuse_opts[] = {
 PGFUSE_OPT( "ro", read_only, 1 ),
 PGFUSE_OPT( "noatime", noatime, 1 ),
-PGFUSE_OPT( "blocksize=%d", block_size, DEFAULT_BLOCK_SIZE ), FUSE_OPT_KEY ( "-h", KEY_HELP ), FUSE_OPT_KEY ( "--help", KEY_HELP ), FUSE_OPT_KEY ( "-v", KEY_VERBOSE ), FUSE_OPT_KEY ( "--verbose", KEY_VERBOSE ), FUSE_OPT_KEY ( "-V", KEY_VERSION ), FUSE_OPT_KEY ( "--version", KEY_VERSION ), FUSE_OPT_END };
+PGFUSE_OPT( "blocksize=%d", block_size, DEFAULT_BLOCK_SIZE ),
+OPTION("config=%s", config),
+FUSE_OPT_KEY ( "-h", KEY_HELP ),
+FUSE_OPT_KEY ( "--help", KEY_HELP ),
+FUSE_OPT_KEY ( "-v", KEY_VERBOSE ),
+FUSE_OPT_KEY ( "--verbose", KEY_VERBOSE ),
+FUSE_OPT_KEY ( "-V", KEY_VERSION ),
+FUSE_OPT_KEY ( "--version", KEY_VERSION ),
+FUSE_OPT_END };
 
 static int pgfuse_opt_proc ( void* data, const char* arg, int key, struct fuse_args* outargs )
 {
@@ -2537,6 +2550,11 @@ static int pgfuse_opt_proc ( void* data, const char* arg, int key, struct fuse_a
 		return 1;
 
 	case FUSE_OPT_KEY_NONOPT:
+	/*
+	if ( pgfuse->config == NULL)
+		{
+			pgfuse->config = strdup ( arg );
+		}
 		if ( pgfuse->conninfo == NULL )
 		{
 			char *str = strdup ( arg );
@@ -2546,19 +2564,18 @@ static int pgfuse_opt_proc ( void* data, const char* arg, int key, struct fuse_a
                         pgfuse->path_portal = strdup( tok );
                         tok = strtok ( NULL, ";" );
 			pgfuse->path_temp = strdup ( tok );
-        	        if ( strstr ( arg, "-s" ) != NULL )
+        	        if ( strstr ( str, "-s" ) != NULL )
 	                {
                         pgfuse->multi_threaded = 0;
                 	}
-	                if ( strstr ( arg, "-v" ) != NULL )
+	                if ( strstr ( str, "-v" ) != NULL )
         	        {
                         pgfuse->verbose = 1;
                 	}
-			fprintf ( stderr, "str=%s\n", arg);
 			free ( str );
 			return 0;
 		}
-
+		*/
 //		else if ( pgfuse->path_portal == NULL )
 //		{
 //			pgfuse->path_portal = strdup ( arg );
@@ -2569,11 +2586,11 @@ static int pgfuse_opt_proc ( void* data, const char* arg, int key, struct fuse_a
 //			pgfuse->path_temp = strdup ( arg );
 //			return 0;
 //		}
-                else if ( pgfuse->mountpoint == NULL )
-                {
-                        pgfuse->mountpoint = strdup ( arg );
-                        return 1;
-                }
+		if ( pgfuse->mountpoint == NULL )
+		{
+			pgfuse->mountpoint = strdup ( arg );
+			return 1;
+		}
 		else
 		{
 			fprintf ( stderr, "%s, only two arguments allowed: Postgresql connection data and mountpoint\n", basename ( outargs->argv[0] ) );
@@ -2589,6 +2606,7 @@ static int pgfuse_opt_proc ( void* data, const char* arg, int key, struct fuse_a
 		return 0;
 
 	case KEY_VERSION:
+		printf("continuing with default values... %s\n\n",arg);
 		pgfuse->print_version = 1;
 		return -1;
 
@@ -2623,6 +2641,7 @@ static void print_usage ( char* progname )
 			"    ro                     mount filesystem read-only, do not change data in database\n"
 			"    noatime                do not try to keep access time up to date on every read (only on close)\n"
 			"    blocksize=<bytes>      block size to use for storage of data\n"
+			"    config=<strings>       path to configuration file"
 			"\n", progname );
 }
 
@@ -2631,11 +2650,33 @@ static void print_usage ( char* progname )
 int main ( int argc, char* argv[] )
 {
 	int res;
+	int ret;
 	PGconn* conn;
 	struct fuse_args args = FUSE_ARGS_INIT ( argc, argv );
 	PgFuseOptions pgfuse;
 	PgFuseData userdata;
 	const char* value;
+	cfg_t* cfg;
+	char conninfo_str[LOG_LEN] = { '\0' };
+
+	cfg_opt_t conninfo[] = {
+		CFG_STR("host", "localhost", CFGF_NONE),
+		CFG_STR("user", "postgres", CFGF_NONE),
+		CFG_STR("dbname", "portal", CFGF_NONE),
+		CFG_STR("password", "Qwertyu*", CFGF_NONE),
+		CFG_END()
+	};
+	cfg_opt_t opts[] = {
+		CFG_BOOL("verbose", cfg_true, CFGF_NONE),
+		CFG_BOOL("multi_threaded", cfg_true, CFGF_NONE),
+		CFG_STR("path_portal", "/data/data-portal-ga3", CFGF_NONE),
+		CFG_STR("path_temp", "/data/tmp-portal", CFGF_NONE),
+		CFG_STR("url", "http://test:test@localhost:8080/o/rest/fuse", CFGF_NONE),
+		CFG_STR_LIST("file_extension", "{tmp, db, TMP, bak, dwl, dwl2}", CFGF_NONE),
+		CFG_STR("unixsocket", "/var/run/redis/redis.sock", CFGF_NONE),
+		CFG_SEC("conninfo", conninfo, CFGF_MULTI ),
+		CFG_END()
+	};
 	/*
 	 struct timeval timeout = { 1, 500000 }; // 1.5 seconds
 	 Redisc = redisConnectUnixWithTimeout( "/tmp/redis.sock", timeout );
@@ -2649,10 +2690,8 @@ int main ( int argc, char* argv[] )
 	 exit(1);
 	 }
 	 */
-	memset ( &pgfuse, 0, sizeof ( pgfuse ) );
-	pgfuse.multi_threaded = 1;
-	pgfuse.block_size = DEFAULT_BLOCK_SIZE;
 
+	memset ( &pgfuse, 0, sizeof ( pgfuse ) );
 	if ( fuse_opt_parse ( &args, &pgfuse, pgfuse_opts, pgfuse_opt_proc ) == -1 )
 	{
 		if ( pgfuse.print_help )
@@ -2675,6 +2714,25 @@ int main ( int argc, char* argv[] )
 		exit ( EXIT_FAILURE );
 	}
 
+	pgfuse.block_size = DEFAULT_BLOCK_SIZE;
+	cfg = cfg_init ( opts, CFGF_NOCASE );
+	ret = cfg_parse ( cfg, pgfuse.config );
+
+	if ( ret == CFG_FILE_ERROR )
+	{
+		printf("warning: configuration file '%s' could not be read: %s\n", pgfuse.config, strerror(errno));
+		printf("continuing with default values...\n\n");
+	}
+
+	pgfuse.multi_threaded = cfg_getbool ( cfg, "multi_threaded" ) ? 1 : 0;
+	pgfuse.verbose = cfg_getbool ( cfg, "verbose" ) ? 1 : 0;
+	pgfuse.path_temp = cfg_getstr ( cfg, "path_temp");
+	pgfuse.path_portal = cfg_getstr ( cfg, "path_portal");
+	cfg_t *con_inf = cfg_getnsec ( cfg, "conninfo", 0 );
+	sprintf ( conninfo_str, "host=%s user=%s dbname=%s password=%s", cfg_getstr(con_inf, "host"), cfg_getstr(con_inf, "user"), cfg_getstr(con_inf, "dbname"), cfg_getstr(con_inf, "password") );
+	pgfuse.conninfo = conninfo_str;
+	pgfuse.cfg = cfg;
+
 	if ( pgfuse.conninfo == NULL )
 	{
 		fprintf ( stderr, "Missing Postgresql connection data\n" );
@@ -2687,8 +2745,7 @@ int main ( int argc, char* argv[] )
 		fprintf ( stderr, "Missing portal data path\n" );
 		fprintf ( stderr, "See '%s -h' for usage\n", basename ( argv[0] ) );
 		exit ( EXIT_FAILURE );
-	}else
-	fprintf ( stderr, "pgfuse.path_portal=%s\n", pgfuse.path_portal);
+	}
 
 	if ( pgfuse.path_temp == NULL )
 	{
@@ -2696,9 +2753,6 @@ int main ( int argc, char* argv[] )
 		fprintf ( stderr, "See '%s -h' for usage\n", basename ( argv[0] ) );
 		exit ( EXIT_FAILURE );
 	}else
-	fprintf ( stderr, "pgfuse.path_temp=%s\n", pgfuse.path_temp);
-	fprintf ( stderr, "pgfuse.verbose=%i\n", pgfuse.verbose);
-	fprintf ( stderr, "pgfuse.multi_threaded=%i\n", pgfuse.multi_threaded);
 
 	/* just test if the connection can be established, do the
 	 * real connection in the fuse init function!
@@ -2763,6 +2817,7 @@ int main ( int argc, char* argv[] )
 	}
 
 	memset ( &userdata, 0, sizeof(PgFuseData) );
+	userdata.cfg            = pgfuse.cfg;
 	userdata.conninfo       = pgfuse.conninfo;
 	userdata.path_temp      = pgfuse.path_temp;
 	userdata.path_portal    = pgfuse.path_portal;

@@ -29,4 +29,4 @@ CFLAGS += `getconf LFS_CFLAGS`
 # use pkg-config to detemine compiler/linker flags for libfuse
 CFLAGS += `pkg-config fuse --cflags`
 LDFLAGSG = -shared -lwbclient -lpq -pthread -luuid
-LDFLAGS = `pkg-config fuse --libs` -lcrypto -lpq -lcurl -pthread -lulockmgr -lwbclient -lhiredis -ljson-c
+LDFLAGS = `pkg-config fuse --libs` `pkg-config libconfuse --libs` -lcrypto -lpq -lcurl -pthread -lulockmgr -lwbclient -lhiredis -ljson-c
